@@ -1,6 +1,7 @@
 altair==4.2.0
 streamlit==1.12.2
 spacy==3.7.1
+geocoder==1.38.1
 git+https://github.com/OmkarPathak/pyresparser.git
 pdfminer.six
 nltk
