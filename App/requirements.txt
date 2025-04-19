@@ -1,6 +1,6 @@
 streamlit==1.12.2
 spacy==3.7.1
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+git+https://github.com/OmkarPathak/pyresparser.git
 pdfminer.six
 nltk
 numpy
@@ -12,4 +12,3 @@ python-dateutil
 PyMySQL
 geopy
 validators
-git+https://github.com/OmkarPathak/pyresparser.git
