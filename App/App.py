@@ -15,6 +15,14 @@ import secrets
 import io,random
 import plotly.express as px # to create visualisations at the admin session
 import plotly.graph_objects as go
+import spacy
+try:
+    nlp = spacy.load("en_core_web_sm")
+except:
+    import subprocess
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load("en_core_web_sm")
+
 from geopy.geocoders import Nominatim
 # libraries used to parse the pdf files
 from pyresparser import ResumeParser
