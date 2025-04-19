@@ -16,13 +16,15 @@ import io,random
 import plotly.express as px # to create visualisations at the admin session
 import plotly.graph_objects as go
 import spacy
-from spacy.cli import download
+import subprocess
+import importlib.util
 
-try:
-    spacy.load("en_core_web_sm")
-except OSError:
-    download("en_core_web_sm")
-    spacy.load("en_core_web_sm")
+def ensure_spacy_model(model_name):
+    if importlib.util.find_spec(model_name) is None:
+        subprocess.run(["python", "-m", "spacy", "download", model_name])
+    return spacy.load(model_name)
+
+nlp = ensure_spacy_model("en_core_web_sm")
 import nltk
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
