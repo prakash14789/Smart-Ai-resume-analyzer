@@ -1,17 +1,15 @@
-import streamlit as st  # core package used in this project
+import streamlit as st # core package used in this project
 import pandas as pd
-import base64
-import random
-import time
-import datetime
+import base64, random
+import time,datetime
 import pymysql
 import os
 import socket
 import platform
 import geocoder
 import secrets
-import io
-import plotly.express as px  # to create visualizations at the admin session
+import io,random
+import plotly.express as px # to create visualisations at the admin session
 import plotly.graph_objects as go
 from geopy.geocoders import Nominatim
 # libraries used to parse the pdf files
@@ -23,96 +21,10 @@ from pdfminer3.pdfinterp import PDFPageInterpreter
 from pdfminer3.converter import TextConverter
 from streamlit_tags import st_tags
 from PIL import Image
-# pre-stored data for prediction purposes
-from Courses import ds_course, web_course, android_course, ios_course, uiux_course, resume_videos, interview_videos
+# pre stored data for prediction purposes
+from Courses import ds_course,web_course,android_course,ios_course,uiux_course,resume_videos,interview_videos
 import nltk
-
-# Download NLTK resources if not already downloaded
-nltk.download('stopwords', quiet=True)
-
-# Initialize geolocator
-geolocator = Nominatim(user_agent="geoapiExercises")
-
-def extract_text_from_pdf(pdf_file):
-    """
-    Extracts text from a PDF file using pdfminer3.
-    """
-    resource_manager = PDFResourceManager()
-    retstr = io.StringIO()
-    codec = 'utf-8'
-    laparams = LAParams()
-    device = TextConverter(resource_manager, retstr, codec=codec, laparams=laparams)
-    interpreter = PDFPageInterpreter(resource_manager, device)
-    
-    with open(pdf_file, 'rb') as file:
-        for page in PDFPage.get_pages(file):
-            interpreter.process_page(page)
-    text = retstr.getvalue()
-    retstr.close()
-    return text
-
-def display_geolocation_info():
-    """
-    Displays geolocation information for a given address.
-    """
-    location = geolocator.geocode("1600 Pennsylvania Ave NW, Washington, DC 20500")
-    if location:
-        st.write(f"Address: {location.address}")
-        st.write(f"Latitude: {location.latitude}, Longitude: {location.longitude}")
-    else:
-        st.write("Address not found.")
-
-def display_resume_parser():
-    """
-    Display a file uploader for resume and parse it.
-    """
-    uploaded_file = st.file_uploader("Upload a Resume", type=["pdf", "docx"])
-    if uploaded_file:
-        # Parsing the resume using pyresparser
-        result = ResumeParser.parse(uploaded_file)
-        st.write(result)
-
-def display_tags():
-    """
-    Display Streamlit tags for skill selection.
-    """
-    tags = st_tags(
-        label='Choose your skills',
-        text='Press enter after typing each tag.',
-        value=['Python', 'Machine Learning', 'Data Science'],
-        suggestions=['AI', 'Web Development', 'Cloud Computing'],
-        maxtags=5
-    )
-    st.write("Selected Tags:", tags)
-
-def display_image():
-    """
-    Displays an image uploaded by the user.
-    """
-    image = Image.open("path_to_image.jpg")  # Adjust the path as needed
-    st.image(image, caption='Uploaded Image', use_column_width=True)
-
-# Main app UI
-st.title("Smart Resume Analyzer")
-st.sidebar.header("Navigation")
-
-# Navigation options in sidebar
-menu = ["Home", "Geolocation", "Resume Parser", "Skills Tags", "Image"]
-choice = st.sidebar.selectbox("Select an option", menu)
-
-if choice == "Home":
-    st.subheader("Welcome to the Smart Resume Analyzer!")
-    st.write("This app analyzes resumes, helps you with skills tagging, and provides geolocation information.")
-elif choice == "Geolocation":
-    display_geolocation_info()
-elif choice == "Resume Parser":
-    display_resume_parser()
-elif choice == "Skills Tags":
-    display_tags()
-elif choice == "Image":
-    display_image()
-
-
+nltk.download('stopwords')
 
 
 ###### Preprocessing functions ######
