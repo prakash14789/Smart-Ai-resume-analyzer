@@ -1,34 +1,48 @@
-# Developed by dnoobnerd [https://dnoobnerd.netlify.app]    Made with Streamlit
-
+# Developed by dnoobnerd [https://dnoobnerd.netlify.app]    
+# Made with Streamlit
 
 ###### Packages Used ######
-import streamlit as st # core package used in this project
+import streamlit as st  # core package used in this project
 import pandas as pd
 import base64, random
-import time,datetime
+import time, datetime
 import pymysql
 import os
 import socket
 import platform
 import geocoder
 import secrets
-import io,random
-import plotly.express as px # to create visualisations at the admin session
+import io, random
+import plotly.express as px  # to create visualizations at the admin session
 import plotly.graph_objects as go
 import spacy
 import subprocess
 import importlib.util
-
-def ensure_spacy_model(model_name):
-    if importlib.util.find_spec(model_name) is None:
-        subprocess.run(["python", "-m", "spacy", "download", model_name])
-    return spacy.load(model_name)
-
-nlp = ensure_spacy_model("en_core_web_sm")
 import nltk
+
+# Ensure spaCy model is downloaded and available
+def ensure_spacy_model(model_name):
+    # Check if the model is available
+    try:
+        nlp = spacy.load(model_name)
+    except OSError:
+        # If not, download the model
+        subprocess.run(["python", "-m", "spacy", "download", model_name])
+        nlp = spacy.load(model_name)
+    return nlp
+
+# Load spaCy model
+nlp = ensure_spacy_model("en_core_web_sm")
+
+# Ensure nltk dependencies are available
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
+
+# Additional logic to handle your app
+# (Add your logic for Streamlit here)
+
+
 
 
 
