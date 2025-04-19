@@ -8,6 +8,12 @@ import base64, random
 import time, datetime
 import pymysql
 import os
+import streamlit as st  # core package used in this project
+import pandas as pd
+import base64, random
+import time, datetime
+import pymysql
+import os
 import socket
 import platform
 import geocoder
@@ -20,29 +26,51 @@ import subprocess
 import importlib.util
 import nltk
 
-# Ensure spaCy model is downloaded and available
+# Function to ensure that SpaCy model is available
 def ensure_spacy_model(model_name):
-    # Check if the model is available
     try:
-        nlp = spacy.load(model_name)
-    except OSError:
-        # If not, download the model
-        subprocess.run(["python", "-m", "spacy", "download", model_name])
-        nlp = spacy.load(model_name)
-    return nlp
+        # Check if the model is already installed
+        if importlib.util.find_spec(model_name) is None:
+            # If not, download the model
+            subprocess.run(["python", "-m", "spacy", "download", model_name])
+        # Load and return the model
+        return spacy.load(model_name)
+    except Exception as e:
+        st.error(f"Error loading SpaCy model: {e}")
+        return None
 
-# Load spaCy model
+# Ensure the "en_core_web_sm" model is available
 nlp = ensure_spacy_model("en_core_web_sm")
 
-# Ensure nltk dependencies are available
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('stopwords')
+# Download necessary NLTK data
+try:
+    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('stopwords')
+except Exception as e:
+    st.error(f"Error downloading NLTK data: {e}")
 
-# Additional logic to handle your app
-# (Add your logic for Streamlit here)
+# Function to check and handle the model's readiness for use
+def check_spacy_model(nlp):
+    if nlp is None:
+        st.error("SpaCy model 'en_core_web_sm' is not available. Please ensure the model is downloaded and installed.")
+        return False
+    return True
 
+# Check if the SpaCy model is ready
+if not check_spacy_model(nlp):
+    st.stop()  # Stop the app if the model is not ready
 
+# Your Streamlit app code continues here...
+
+# Example of usage with NLP
+if nlp:
+    # Example NLP operation (tokenizing some text)
+    doc = nlp("Streamlit is an amazing tool for creating ML apps.")
+    tokens = [token.text for token in doc]
+    st.write(f"Tokens: {tokens}")
+
+# Additional code for handling the rest of your app...
 
 
 
