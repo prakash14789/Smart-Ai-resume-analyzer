@@ -1,19 +1,21 @@
 import streamlit as st # core package used in this project
 import pandas as pd
 import base64, random
-import time,datetime
+import time, datetime
 import pymysql
 import os
 import socket
 import platform
 import geocoder
 import secrets
-import io,random
-import plotly.express as px # to create visualisations at the admin session
+import io
+import plotly.express as px  # to create visualizations in the admin session
 import plotly.graph_objects as go
 from geopy.geocoders import Nominatim
-# libraries used to parse the pdf files
-from pyresparser import ResumeParser
+
+# Libraries for resume parsing
+import spacy
+import nltk
 from pdfminer3.layout import LAParams, LTTextBox
 from pdfminer3.pdfpage import PDFPage
 from pdfminer3.pdfinterp import PDFResourceManager
@@ -21,10 +23,102 @@ from pdfminer3.pdfinterp import PDFPageInterpreter
 from pdfminer3.converter import TextConverter
 from streamlit_tags import st_tags
 from PIL import Image
-# pre stored data for prediction purposes
-from Courses import ds_course,web_course,android_course,ios_course,uiux_course,resume_videos,interview_videos
-import nltk
-nltk.download('stopwords')
+
+# Pre-stored data for prediction purposes
+from Courses import (
+    ds_course,
+    web_course,
+    android_course,
+    ios_course,
+    uiux_course,
+    resume_videos,
+    interview_videos
+)
+
+# Download necessary NLTK resources if not already downloaded
+nltk.download('stopwords', quiet=True)
+
+# Load spaCy model
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    import subprocess
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load("en_core_web_sm")
+
+# Function to extract text from PDF using PDFMiner3
+def extract_text_from_pdf(pdf_file):
+    """
+    Extracts text from a PDF file using pdfminer3.
+    """
+    resource_manager = PDFResourceManager()
+    retstr = io.StringIO()
+    codec = 'utf-8'
+    laparams = LAParams()
+    device = TextConverter(resource_manager, retstr, codec=codec, laparams=laparams)
+    interpreter = PDFPageInterpreter(resource_manager, device)
+    
+    with open(pdf_file, 'rb') as file:
+        for page in PDFPage.get_pages(file):
+            interpreter.process_page(page)
+    text = retstr.getvalue()
+    retstr.close()
+    return text
+
+# Function to parse resume using spaCy
+def parse_resume_with_spacy(resume_text):
+    """
+    Parses the resume text using spaCy's NLP model to extract entities like names, organizations, and locations.
+    """
+    doc = nlp(resume_text)
+    extracted_info = {
+        "Names": [],
+        "Organizations": [],
+        "Locations": []
+    }
+
+    for ent in doc.ents:
+        if ent.label_ == "PERSON":
+            extracted_info["Names"].append(ent.text)
+        elif ent.label_ == "ORG":
+            extracted_info["Organizations"].append(ent.text)
+        elif ent.label_ == "GPE":
+            extracted_info["Locations"].append(ent.text)
+
+    return extracted_info
+
+# Display resume parsing UI in Streamlit
+def display_resume_parser():
+    """
+    Displays file uploader and shows parsed resume information.
+    """
+    uploaded_file = st.file_uploader("Upload a Resume", type=["pdf", "docx"])
+    if uploaded_file:
+        # Extract text from uploaded PDF file
+        resume_text = extract_text_from_pdf(uploaded_file)
+        
+        # Parse the resume text using spaCy
+        resume_info = parse_resume_with_spacy(resume_text)
+        
+        # Display extracted information
+        st.write("Extracted Information:")
+        st.write(resume_info)
+
+# Add Streamlit UI components
+st.title("Resume Analyzer")
+display_resume_parser()
+
+# Example: Display pre-stored courses and videos
+st.subheader("Available Courses")
+st.write("Data Science:", ds_course)
+st.write("Web Development:", web_course)
+st.write("Android Development:", android_course)
+st.write("iOS Development:", ios_course)
+st.write("UI/UX Design:", uiux_course)
+
+st.subheader("Resume and Interview Videos")
+st.write("Resume Videos:", resume_videos)
+st.write("Interview Videos:", interview_videos)
 
 
 ###### Preprocessing functions ######
